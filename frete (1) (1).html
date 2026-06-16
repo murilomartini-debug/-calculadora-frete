@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Calculadora de Frete</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f3f4f6;color:#111}
+header{background:linear-gradient(135deg,#0f2027,#1a3a2a);padding:28px 16px 44px;text-align:center}
+header h1{color:#fff;font-size:24px;font-weight:800;margin:8px 0 4px}
+header h1 span{color:#4ade80}
+header p{color:rgba(255,255,255,0.55);font-size:13px}
+main{max-width:600px;margin:-20px auto 0;padding:0 14px 40px}
+.card{background:#fff;border-radius:14px;padding:18px 14px;margin-bottom:12px;border:1px solid #e5e7eb}
+#res-card{text-align:center;border-width:2px;transition:border-color .3s,background .3s}
+#res-emoji{font-size:48px;display:block;margin-bottom:8px}
+#res-titulo{font-size:20px;font-weight:800;margin-bottom:4px}
+#res-sub{font-size:13px;opacity:.85}
+.metricas{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.met{background:#fff;border-radius:10px;padding:12px 14px;border:1px solid #e5e7eb}
+.met-label{font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.met-val{font-size:17px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sec-title{font-size:11px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.campo label{display:block;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.campo input{width:100%;padding:13px 12px;font-size:16px;border:1.5px solid #e5e7eb;border-radius:9px;background:#f9fafb;color:#111;font-family:inherit;-webkit-appearance:none;appearance:none}
+.campo input:focus{outline:none;border-color:#16a34a;background:#fff}
+.veic-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
+.veic-btn{padding:10px 4px;font-size:12px;font-weight:600;border:1.5px solid #e5e7eb;border-radius:8px;background:#f9fafb;color:#374151;cursor:pointer;font-family:inherit;text-align:center}
+.veic-btn.ativo{border-color:#16a34a;background:#f0fdf4;color:#15803d}
+.det-linha{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e5e7eb;font-size:14px}
+.det-linha:last-child{border:none;font-weight:700;font-size:15px;padding-top:10px}
+.det-nome{color:#6b7280}
+.barra-item{margin-bottom:10px}
+.barra-info{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.barra-nome{color:#6b7280}
+.barra-pct{font-weight:700}
+.barra-bg{height:7px;background:#f3f4f6;border-radius:99px;overflow:hidden}
+.barra-fill{height:100%;background:#16a34a;border-radius:99px;transition:width .4s}
+.btn-limpar{width:100%;padding:14px;background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;font-size:15px;color:#6b7280;cursor:pointer;font-family:inherit;font-weight:500}
+</style>
+</head>
+<body>
+<header>
+  <div style="font-size:44px">🚚</div>
+  <h1>Calculadora de <span>Frete</span></h1>
+  <p>Descubra se o frete vale a pena</p>
+</header>
+<main>
+  <div class="card" id="res-card" style="background:#f9fafb;border-color:#e5e7eb">
+    <span id="res-emoji">📋</span>
+    <div id="res-titulo" style="color:#6b7280">Preencha os dados</div>
+    <div id="res-sub" style="color:#9ca3af">Distância, valor, consumo e diesel são obrigatórios</div>
+  </div>
+
+  <div class="metricas">
+    <div class="met"><div class="met-label">💰 Recebe</div><div class="met-val" id="m-recebe">R$ —</div></div>
+    <div class="met"><div class="met-label">💸 Gasta</div><div class="met-val" id="m-gasta">R$ —</div></div>
+    <div class="met"><div class="met-label">📈 Resultado</div><div class="met-val" id="m-lucro">R$ —</div></div>
+    <div class="met"><div class="met-label">⛽ Combustível</div><div class="met-val" id="m-diesel">R$ —</div></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">📍 Dados da viagem</div>
+    <div class="grid2">
+      <div class="campo"><label>Distância (km)</label><input id="distancia" type="tel" placeholder="Ex: 1400"></div>
+      <div class="campo"><label>Valor do frete (R$)</label><input id="valorFrete" type="tel" placeholder="Ex: 9500"></div>
+    </div>
+    <div class="sec-title" style="margin-bottom:8px">Tipo de veículo</div>
+    <div class="veic-grid" id="veic-grid">
+      <button class="veic-btn ativo" data-km="2.3" onclick="selecionarVeic(this)">🚛 Carreta</button>
+      <button class="veic-btn" data-km="1.9" onclick="selecionarVeic(this)">🚛 Bitrem</button>
+      <button class="veic-btn" data-km="1.7" onclick="selecionarVeic(this)">🚛 Rodotrem</button>
+      <button class="veic-btn" data-km="2.8" onclick="selecionarVeic(this)">🚚 Truck</button>
+      <button class="veic-btn" data-km="5.0" onclick="selecionarVeic(this)">🚐 VUC</button>
+      <button class="veic-btn" data-km="" onclick="selecionarVeic(this)">✏️ Outro</button>
+    </div>
+    <div class="campo"><label>Consumo (km/L)</label><input id="consumo" type="tel" value="2.3" placeholder="Ex: 2.3"></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-title">💸 Custos da viagem</div>
+    <div class="grid2">
+      <div class="campo"><label>⛽ Diesel (R$/L)</label><input id="diesel" type="tel" placeholder="Ex: 7.10"></div>
+      <div class="campo"><label>🛣️ Pedágios (R$)</label><input id="pedagio" type="tel" placeholder="Ex: 477"></div>
+    </div>
+    <div class="grid2">
+      <div class="campo"><label>🔧 Manutenção (R$)</label><input id="manutencao" type="tel" placeholder="Ex: 1200"></div>
+      <div class="campo"><label>👤 Diária (R$)</label><input id="diaria" type="tel" placeholder="Ex: 400"></div>
+    </div>
+    <div class="grid2">
+      <div class="campo"><label>🤝 Comissão (%)</label><input id="comissao" type="tel" placeholder="Ex: 18"></div>
+      <div class="campo"><label>📄 Impostos (%)</label><input id="impostos" type="tel" placeholder="Ex: 8"></div>
+    </div>
+    <div class="campo"><label>📦 Outros custos (R$)</label><input id="outros" type="tel" placeholder="Ex: 0"></div>
+  </div>
+
+  <div class="card" id="det-card" style="display:none">
+    <div class="sec-title">📊 Onde vai o dinheiro</div>
+    <div id="barras"></div>
+    <div style="border-top:1px dashed #e5e7eb;margin-top:4px">
+      <div class="det-linha"><span class="det-nome">⛽ Combustível</span><span id="d-comb"></span></div>
+      <div class="det-linha"><span class="det-nome">🛣️ Pedágios</span><span id="d-ped"></span></div>
+      <div class="det-linha"><span class="det-nome">🔧 Manutenção</span><span id="d-man"></span></div>
+      <div class="det-linha"><span class="det-nome">👤 Diária</span><span id="d-dia"></span></div>
+      <div class="det-linha"><span class="det-nome">🤝 Comissão</span><span id="d-com"></span></div>
+      <div class="det-linha"><span class="det-nome">📄 Impostos</span><span id="d-imp"></span></div>
+      <div class="det-linha"><span class="det-nome">📦 Outros</span><span id="d-out"></span></div>
+      <div class="det-linha"><span>Total de custos</span><span id="d-tot"></span></div>
+    </div>
+  </div>
+
+  <button class="btn-limpar" id="btn-limpar">🔄 Limpar tudo e começar de novo</button>
+</main>
+
+<script>
+var IDS = ['distancia','valorFrete','consumo','diesel','pedagio','manutencao','diaria','comissao','impostos','outros'];
+
+function fmt(v){return 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function n(id){var v=parseFloat((document.getElementById(id).value||'').replace(',','.'));return isNaN(v)?0:v;}
+
+function calcular(){
+  var dist=n('distancia'),valor=n('valorFrete'),consumo=n('consumo'),diesel=n('diesel');
+  var pedagio=n('pedagio'),man=n('manutencao'),diaria=n('diaria');
+  var comPct=n('comissao'),impPct=n('impostos'),outros=n('outros');
+
+  var pronto = dist>0 && valor>0 && consumo>0 && diesel>0;
+  var card=document.getElementById('res-card');
+  var det=document.getElementById('det-card');
+
+  if(!pronto){
+    card.style.background='#f9fafb'; card.style.borderColor='#e5e7eb';
+    document.getElementById('res-emoji').textContent='📋';
+    document.getElementById('res-titulo').style.color='#6b7280';
+    document.getElementById('res-titulo').textContent='Preencha os dados';
+    document.getElementById('res-sub').textContent='Distância, valor, consumo e diesel são obrigatórios';
+    document.getElementById('res-sub').style.color='#9ca3af';
+    ['m-recebe','m-gasta','m-lucro','m-diesel'].forEach(function(id){
+      var el=document.getElementById(id); el.textContent='R$ —'; el.style.color='#111';
+    });
+    det.style.display='none';
+    return;
+  }
+
+  var comb=(dist/consumo)*diesel;
+  var comVal=valor*(comPct/100);
+  var impVal=valor*(impPct/100);
+  var total=comb+pedagio+man+diaria+comVal+impVal+outros;
+  var lucro=valor-total;
+  var pct=((lucro/valor)*100).toFixed(1);
+
+  if(lucro>0){
+    card.style.background='#f0fdf4'; card.style.borderColor='#86efac';
+    document.getElementById('res-emoji').textContent='✅';
+    document.getElementById('res-titulo').style.color='#15803d';
+    document.getElementById('res-titulo').textContent='VALE A PENA!';
+    document.getElementById('res-sub').style.color='#15803d';
+    document.getElementById('res-sub').textContent='Lucro de '+fmt(lucro)+' ('+pct+'% do frete)';
+  } else if(lucro<0){
+    card.style.background='#fef2f2'; card.style.borderColor='#fca5a5';
+    document.getElementById('res-emoji').textContent='❌';
+    document.getElementById('res-titulo').style.color='#dc2626';
+    document.getElementById('res-titulo').textContent='PREJUÍZO!';
+    document.getElementById('res-sub').style.color='#dc2626';
+    document.getElementById('res-sub').textContent='Faltam '+fmt(Math.abs(lucro))+' para cobrir os custos';
+  } else {
+    card.style.background='#fffbeb'; card.style.borderColor='#fde68a';
+    document.getElementById('res-emoji').textContent='⚖️';
+    document.getElementById('res-titulo').style.color='#d97706';
+    document.getElementById('res-titulo').textContent='NO ZERO';
+    document.getElementById('res-sub').style.color='#d97706';
+    document.getElementById('res-sub').textContent='Frete apenas cobre os custos';
+  }
+
+  document.getElementById('m-recebe').textContent=fmt(valor);
+  document.getElementById('m-gasta').textContent=fmt(total);
+  var ml=document.getElementById('m-lucro');
+  ml.textContent=fmt(lucro);
+  ml.style.color=lucro>0?'#15803d':lucro<0?'#dc2626':'#111';
+  document.getElementById('m-diesel').textContent=fmt(comb);
+
+  document.getElementById('d-comb').textContent=fmt(comb);
+  document.getElementById('d-ped').textContent=fmt(pedagio);
+  document.getElementById('d-man').textContent=fmt(man);
+  document.getElementById('d-dia').textContent=fmt(diaria);
+  document.getElementById('d-com').textContent=fmt(comVal);
+  document.getElementById('d-imp').textContent=fmt(impVal);
+  document.getElementById('d-out').textContent=fmt(outros);
+  document.getElementById('d-tot').textContent=fmt(total);
+
+  var itens=[
+    {nome:'⛽ Combustível',val:comb},{nome:'🛣️ Pedágios',val:pedagio},
+    {nome:'🔧 Manutenção',val:man},{nome:'👤 Diária',val:diaria},
+    {nome:'🤝 Comissão',val:comVal},{nome:'📄 Impostos',val:impVal},{nome:'📦 Outros',val:outros}
+  ].filter(function(i){return i.val>0;});
+  var maxV=Math.max.apply(null,itens.map(function(i){return i.val;}));
+  var html='';
+  itens.forEach(function(it){
+    var p=total>0?((it.val/total)*100).toFixed(0):0;
+    var w=maxV>0?((it.val/maxV)*100).toFixed(1):0;
+    html+='<div class="barra-item"><div class="barra-info"><span class="barra-nome">'+it.nome+'</span><span class="barra-pct">'+p+'% — '+fmt(it.val)+'</span></div><div class="barra-bg"><div class="barra-fill" style="width:'+w+'%"></div></div></div>';
+  });
+  document.getElementById('barras').innerHTML=html;
+  det.style.display='block';
+}
+
+function selecionarVeic(btn){
+  document.querySelectorAll('.veic-btn').forEach(function(b){b.className='veic-btn';});
+  btn.className='veic-btn ativo';
+  if(btn.dataset.km) document.getElementById('consumo').value=btn.dataset.km;
+  calcular();
+}
+
+// Escuta TODOS os inputs com listener direto no documento
+document.addEventListener('input', function(e){
+  if(IDS.indexOf(e.target.id)!==-1) calcular();
+});
+document.addEventListener('change', function(e){
+  if(IDS.indexOf(e.target.id)!==-1) calcular();
+});
+
+document.getElementById('btn-limpar').addEventListener('click', function(){
+  IDS.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  document.getElementById('consumo').value='2.3';
+  document.querySelectorAll('.veic-btn').forEach(function(b,i){b.className='veic-btn'+(i===0?' ativo':'');});
+  calcular();
+  window.scrollTo(0,0);
+});
+</script>
+</body>
+</html>
