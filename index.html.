@@ -44,8 +44,8 @@ main{max-width:600px;margin:-20px auto 0;padding:0 14px 40px}
 <body>
 <header>
   <div style="font-size:44px">🚚</div>
+  <p style="color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;margin-bottom:4px">Transportadora Martini</p>
   <h1>Calculadora de <span>Frete</span></h1>
-  <p>Descubra se o frete vale a pena</p>
 </header>
 <main>
   <div class="card" id="res-card" style="background:#f9fafb;border-color:#e5e7eb">
