@@ -10,7 +10,6 @@ body{font-family:system-ui,sans-serif;background:#f3f4f6;color:#111}
 header{background:linear-gradient(135deg,#0f2027,#1a3a2a);padding:28px 16px 44px;text-align:center}
 header h1{color:#fff;font-size:24px;font-weight:800;margin:8px 0 4px}
 header h1 span{color:#4ade80}
-header p{color:rgba(255,255,255,0.55);font-size:13px}
 main{max-width:600px;margin:-20px auto 0;padding:0 14px 40px}
 .card{background:#fff;border-radius:14px;padding:18px 14px;margin-bottom:12px;border:1px solid #e5e7eb}
 #res-card{text-align:center;border-width:2px;transition:border-color .3s,background .3s}
@@ -44,7 +43,7 @@ main{max-width:600px;margin:-20px auto 0;padding:0 14px 40px}
 <body>
 <header>
   <div style="font-size:44px">🚚</div>
-  <p style="color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;margin-bottom:4px">Transportadora Martini</p>
+  <p style="color:rgba(255,255,255,0.45);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;margin-bottom:6px">Transportadora Martini</p>
   <h1>Calculadora de <span>Frete</span></h1>
 </header>
 <main>
@@ -116,70 +115,59 @@ main{max-width:600px;margin:-20px auto 0;padding:0 14px 40px}
 
 <script>
 var IDS = ['distancia','valorFrete','consumo','diesel','pedagio','manutencao','diaria','comissao','impostos','outros'];
-
 function fmt(v){return 'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
 function n(id){var v=parseFloat((document.getElementById(id).value||'').replace(',','.'));return isNaN(v)?0:v;}
-
 function calcular(){
   var dist=n('distancia'),valor=n('valorFrete'),consumo=n('consumo'),diesel=n('diesel');
   var pedagio=n('pedagio'),man=n('manutencao'),diaria=n('diaria');
   var comPct=n('comissao'),impPct=n('impostos'),outros=n('outros');
-
-  var pronto = dist>0 && valor>0 && consumo>0 && diesel>0;
+  var pronto=dist>0&&valor>0&&consumo>0&&diesel>0;
   var card=document.getElementById('res-card');
   var det=document.getElementById('det-card');
-
   if(!pronto){
-    card.style.background='#f9fafb'; card.style.borderColor='#e5e7eb';
+    card.style.background='#f9fafb';card.style.borderColor='#e5e7eb';
     document.getElementById('res-emoji').textContent='📋';
     document.getElementById('res-titulo').style.color='#6b7280';
     document.getElementById('res-titulo').textContent='Preencha os dados';
     document.getElementById('res-sub').textContent='Distância, valor, consumo e diesel são obrigatórios';
     document.getElementById('res-sub').style.color='#9ca3af';
-    ['m-recebe','m-gasta','m-lucro','m-diesel'].forEach(function(id){
-      var el=document.getElementById(id); el.textContent='R$ —'; el.style.color='#111';
-    });
-    det.style.display='none';
-    return;
+    ['m-recebe','m-gasta','m-lucro','m-diesel'].forEach(function(id){var el=document.getElementById(id);el.textContent='R$ —';el.style.color='#111';});
+    det.style.display='none';return;
   }
-
   var comb=(dist/consumo)*diesel;
   var comVal=valor*(comPct/100);
   var impVal=valor*(impPct/100);
   var total=comb+pedagio+man+diaria+comVal+impVal+outros;
   var lucro=valor-total;
   var pct=((lucro/valor)*100).toFixed(1);
-
   if(lucro>0){
-    card.style.background='#f0fdf4'; card.style.borderColor='#86efac';
+    card.style.background='#f0fdf4';card.style.borderColor='#86efac';
     document.getElementById('res-emoji').textContent='✅';
     document.getElementById('res-titulo').style.color='#15803d';
     document.getElementById('res-titulo').textContent='VALE A PENA!';
     document.getElementById('res-sub').style.color='#15803d';
     document.getElementById('res-sub').textContent='Lucro de '+fmt(lucro)+' ('+pct+'% do frete)';
-  } else if(lucro<0){
-    card.style.background='#fef2f2'; card.style.borderColor='#fca5a5';
+  }else if(lucro<0){
+    card.style.background='#fef2f2';card.style.borderColor='#fca5a5';
     document.getElementById('res-emoji').textContent='❌';
     document.getElementById('res-titulo').style.color='#dc2626';
     document.getElementById('res-titulo').textContent='PREJUÍZO!';
     document.getElementById('res-sub').style.color='#dc2626';
     document.getElementById('res-sub').textContent='Faltam '+fmt(Math.abs(lucro))+' para cobrir os custos';
-  } else {
-    card.style.background='#fffbeb'; card.style.borderColor='#fde68a';
+  }else{
+    card.style.background='#fffbeb';card.style.borderColor='#fde68a';
     document.getElementById('res-emoji').textContent='⚖️';
     document.getElementById('res-titulo').style.color='#d97706';
     document.getElementById('res-titulo').textContent='NO ZERO';
     document.getElementById('res-sub').style.color='#d97706';
     document.getElementById('res-sub').textContent='Frete apenas cobre os custos';
   }
-
   document.getElementById('m-recebe').textContent=fmt(valor);
   document.getElementById('m-gasta').textContent=fmt(total);
   var ml=document.getElementById('m-lucro');
   ml.textContent=fmt(lucro);
   ml.style.color=lucro>0?'#15803d':lucro<0?'#dc2626':'#111';
   document.getElementById('m-diesel').textContent=fmt(comb);
-
   document.getElementById('d-comb').textContent=fmt(comb);
   document.getElementById('d-ped').textContent=fmt(pedagio);
   document.getElementById('d-man').textContent=fmt(man);
@@ -188,7 +176,6 @@ function calcular(){
   document.getElementById('d-imp').textContent=fmt(impVal);
   document.getElementById('d-out').textContent=fmt(outros);
   document.getElementById('d-tot').textContent=fmt(total);
-
   var itens=[
     {nome:'⛽ Combustível',val:comb},{nome:'🛣️ Pedágios',val:pedagio},
     {nome:'🔧 Manutenção',val:man},{nome:'👤 Diária',val:diaria},
@@ -204,27 +191,16 @@ function calcular(){
   document.getElementById('barras').innerHTML=html;
   det.style.display='block';
 }
-
 function selecionarVeic(btn){
   document.querySelectorAll('.veic-btn').forEach(function(b){b.className='veic-btn';});
   btn.className='veic-btn ativo';
   if(btn.dataset.km) document.getElementById('consumo').value=btn.dataset.km;
   calcular();
 }
-
-// Escuta TODOS os inputs com listener direto no documento
-document.addEventListener('input', function(e){
-  if(IDS.indexOf(e.target.id)!==-1) calcular();
-});
-document.addEventListener('change', function(e){
-  if(IDS.indexOf(e.target.id)!==-1) calcular();
-});
-
-document.getElementById('btn-limpar').addEventListener('click', function(){
-  IDS.forEach(function(id){
-    var el=document.getElementById(id);
-    if(el) el.value='';
-  });
+document.addEventListener('input',function(e){if(IDS.indexOf(e.target.id)!==-1)calcular();});
+document.addEventListener('change',function(e){if(IDS.indexOf(e.target.id)!==-1)calcular();});
+document.getElementById('btn-limpar').addEventListener('click',function(){
+  IDS.forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('consumo').value='2.3';
   document.querySelectorAll('.veic-btn').forEach(function(b,i){b.className='veic-btn'+(i===0?' ativo':'');});
   calcular();
